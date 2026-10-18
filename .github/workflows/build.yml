@@ -22,3 +22,11 @@ jobs:
 
       - name: Build all Maven modules
         run: mvn --batch-mode clean install
+
+      - name: Build and push service images with Jib to Docker Hub
+        run: >
+          mvn --batch-mode
+          -pl FrontService,UserService,TaskService
+          -Djib.to.auth.username="${{ vars.DOCKERHUB_USERNAME }}"
+          -Djib.to.auth.password="${{ secrets.DOCKERHUB_TOKEN }}"
+          jib:build
