@@ -2,12 +2,13 @@ name: Build task-manager
 
 on:
   push:
-    branches: main
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      -name: Print greeting
-      run: echo "Welcome"
+      - name: Print greeting
+        run: echo "Welcome"
