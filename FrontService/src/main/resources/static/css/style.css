@@ -1,0 +1,155 @@
+html, body {
+  height: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+body {/* --- Task Calendar and Task List Styles --- */
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f7f7fa;
+  color: #222;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #b4b4b4; /* Changed background color */
+  color: white; /* Added text color */
+  padding: 16px 40px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+.header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: white; /* Changed text color to white */
+  margin-right: auto;
+  padding-left: 20px;
+}
+.header-links a {
+  margin-left: 32px;
+  text-decoration: none;
+  color: white; /* Changed link color to white */
+  font-weight: 500;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+.header-links a:hover {
+  color: #cccccc; /* Changed hover color */
+  text-decoration: underline;
+}
+
+.header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #0066cc;
+  margin-right: auto;
+  padding-left: 20px;
+}
+
+.header-links a {
+  margin-left: 32px;
+  text-decoration: none;
+  color: #0a2540;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+
+.header-links a:hover {
+  color: #0056a3;
+  text-decoration: underline;
+}
+
+.main-content {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  text-align: center;
+  padding: 16px 20px 32px 20px;
+}
+
+.main-content h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.main-content p {
+  font-size: 1.25rem;
+  margin-bottom: 36px;
+  color: #444;
+}
+
+.cta-button {
+  background: #0066cc;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 14px 40px;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+}
+
+.cta-button:hover {
+  background: #0056a3;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 16px 24px;
+
+  font-size: 1rem;
+  letter-spacing: 0.2px;
+
+  /* Optional improvements */
+  box-sizing: border-box;
+  z-index: 1000; /* ensures it stays above content */
+}
+
+.footer a {
+  color: #fff;
+  text-decoration: underline;
+  margin: 0 10px;
+  transition: color 0.2s;
+}
+
+.footer a:hover {
+  color: #cccccc;
+}
+
+@media (max-width: 600px) {
+  .header, .main-content, .footer {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .header-links a {
+    margin-left: 15px;
+    font-size: 0.95rem;
+  }
+  .main-content h1 {
+    font-size: 1.5rem;
+  }
+  .main-content p, .footer {
+    font-size: 1rem;
+  }
+  .cta-button {
+    padding: 10px 24px;
+    font-size: 1rem;
+  }
+}

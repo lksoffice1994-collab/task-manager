@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Learning - Sign Up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/signup.css}">
+</head>
+<body>
+<header class="header">
+    <a class="header-title" th:href="@{/}">Learning</a>
+    <nav class="header-links">
+        <a th:href="@{/contact}">Contact Us</a>
+        <a th:href="@{/signup}">Sign Up</a>
+        <a th:href="@{/signin}">Sign In</a>
+    </nav>
+</header>
+<main class="main-content">
+    <h1>Sign Up</h1>
+    <form class="signup-form" th:action="@{/signup}" method="post" th:object="${user}">
+        <div th:if="${#fields.hasGlobalErrors()}" class="validation-global-error">
+            <ul>
+                <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
+            </ul>
+        </div>
+        <div>
+            <label for="userId">userId:</label>
+            <input type="text" id="userId" th:field="*{userId}" required />
+            <div th:if="${#fields.hasErrors('userId')}" class="validation-error">
+                <span th:errors="*{userId}"></span>
+            </div>
+        </div>
+
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" th:field="*{username}" required />
+            <div th:if="${#fields.hasErrors('username')}" class="validation-error">
+                <span th:errors="*{username}"></span>
+            </div>
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" th:field="*{email}" required />
+            <div th:if="${#fields.hasErrors('email')}" class="validation-error">
+                <span th:errors="*{email}"></span>
+            </div>
+        </div>
+        <div>
+            <label for="contactNumber">Contact Number:</label>
+            <input type="text" id="contactNumber" th:field="*{contactNumber}" required size="10"/>
+            <div th:if="${#fields.hasErrors('contactNumber')}" class="validation-error">
+                <span th:errors="*{contactNumber}"></span>
+            </div>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" th:field="*{password}" required min="6"/>
+            <div th:if="${#fields.hasErrors('password')}" class="validation-error">
+                <span th:errors="*{password}"></span>
+            </div>
+        </div>
+        <div>
+            <label for="address">Address:</label>
+            <textarea id="address" th:field="*{address}" required></textarea>
+            <div th:if="${#fields.hasErrors('address')}" class="validation-error">
+                <span th:errors="*{address}"></span>
+            </div>
+        </div>
+        <div>
+            <input type="submit" value="Sign Up" />
+        </div>
+        <div class="error-message" th:if="${error}">
+            <p style="color:red; font-weight:bold;" th:text="${error}"></p>
+        </div>
+    </form>
+</main>
+<footer class="footer">
+    <a th:href="@{/privacy}">Privacy Policy</a> |
+    <a th:href="@{/terms}">Terms of Use</a> |
+    <a th:href="@{/accessibility}">Accessibility</a>
+</footer>
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>

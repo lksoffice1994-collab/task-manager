@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <!-- 
+        MASTER CHANGELOG
+        This file orchestrates all schema changes via <include>.
+        Place individual table, DDL, or SQL changesets in subfolders (e.g., db/changelog/sql/)
+        and include them below.
+        Below we use an SQL-based migration for user_entity.
+    -->
+
+    <!-- You can use includeAll to auto-include all migrations in the sql/ folder -->
+    <includeAll path="db/changelog/sql" relativeToChangelogFile="false"/>
+</databaseChangeLog>

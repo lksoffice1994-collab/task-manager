@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Privacy Policy - Learning Platform</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/signup.css}">
+</head>
+<body>
+<header class="header">
+    <a class="header-title" th:href="@{/}">Learning</a>
+    <nav class="header-links">
+        <a th:href="@{/contact}">Contact Us</a>
+        <a th:href="@{/signup}">Sign Up</a>
+        <a th:href="@{/signin}">Sign In</a>
+    </nav>
+</header>
+<main class="main-content">
+    <h1>Privacy Policy</h1>
+    <p>Your privacy is important to us. This policy describes how Learning handles personal information and privacy.</p>
+    <ul>
+      <li>We only collect data required for creating and managing your Learning Platform account.</li>
+      <li>We do not sell your data to third parties.</li>
+      <li>You have the right to request deletion of your account and data.</li>
+      <li>For any data/privacy concerns, contact: <strong>contact@learning.com</strong></li>
+    </ul>
+</main>
+<footer class="footer">
+    <a th:href="@{/privacy}">Privacy Policy</a> |
+    <a th:href="@{/terms}">Terms of Use</a> |
+    <a th:href="@{/accessibility}">Accessibility</a>
+</footer>
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>

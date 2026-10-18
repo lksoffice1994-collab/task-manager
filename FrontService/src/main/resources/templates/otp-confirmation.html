@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Learning - OTP Confirmation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/signup.css}">
+</head>
+<body>
+<header class="header">
+    <a class="header-title" th:href="@{/}">Learning</a>
+    <nav class="header-links">
+        <a th:href="@{/contact}">Contact Us</a>
+        <a th:href="@{/signup}">Sign Up</a>
+        <a th:href="@{/signin}">Sign In</a>
+    </nav>
+</header>
+<main class="main-content">
+<!--    <h1 th:text="'Hi ' + ${username} + ','"></h1>-->
+
+    <p th:text="'Hi, Your userId is ' + ${userId} + '. Please verify OTP which is received on your mail or mobile.'"></p>
+    <form class="signup-form" th:action="@{/otp-confirmation}" method="post">
+    <input type="hidden" name="jwt" th:value="${jwtToken}" />
+        <input type="hidden" th:name="userId" th:value="${userId}" />
+        <div>
+            <label for="otp">Enter OTP:</label>
+            <input type="text" id="otp" name="otp" required />
+        </div>
+        <div>
+            <input type="submit" value="Confirm OTP" />
+        </div>
+    </form>
+</main>
+<footer class="footer">
+    <a th:href="@{/privacy}">Privacy Policy</a> |
+    <a th:href="@{/terms}">Terms of Use</a> |
+    <a th:href="@{/accessibility}">Accessibility</a>
+</footer>
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>

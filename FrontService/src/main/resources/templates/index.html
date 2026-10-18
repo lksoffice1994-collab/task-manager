@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Learning - Welcome</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header class="header">
+  <a class="header-title" th:href="@{/}">Learning</a>
+  <nav class="header-links">
+    <a th:href="@{/contact}">Contact Us</a>
+    <a th:href="@{/signup}">Sign Up</a>
+    <a th:href="@{/signin}">Sign In</a>
+  </nav>
+</header>
+<main class="main-content">
+  <h1>Welcome to Learning!</h1>
+  <p>Your gateway to continuous growth and knowledge sharing.</p>
+  <button class="cta-button" onclick="location.href='signup'">Get Started</button>
+</main>
+<footer class="footer">
+  <a th:href="@{/privacy}">Privacy Policy</a> |
+  <a th:href="@{/terms}">Terms of Use</a> |
+  <a th:href="@{/accessibility}">Accessibility</a>
+</footer>
+<script th:src="@{/js/script.js}"></script>
+  <div style="margin-top: 2em; text-align: center;">
+    <a href="/tasks" style="font-size: 1.1em; color: #007bff;">Go to Task Calendar</a>
+  </div>
+</body>
+</html>
