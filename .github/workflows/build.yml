@@ -1,13 +1,39 @@
 name: Build task-manager
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      front_service:
+        description: FrontService
+        type: choice
+        options:
+          - Run
+          - Skip
+        default: Run
+        required: true
+      user_service:
+        description: UserService
+        type: choice
+        options:
+          - Run
+          - Skip
+        default: Run
+        required: true
+      task_service:
+        description: TaskService
+        type: choice
+        options:
+          - Run
+          - Skip
+        default: Run
+        required: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
     steps:
       - name: Check out repository
@@ -20,13 +46,23 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - name: Build all Maven modules
-        run: mvn --batch-mode clean install
-
-      - name: Build and push service images with Jib to Docker Hub
+      - name: Build and push FrontService
+        if: ${{ inputs.front_service == 'Run' }}
         run: >
-          mvn --batch-mode
-          -pl FrontService,UserService,TaskService
-          -Djib.to.auth.username="${{ vars.DOCKERHUB_USERNAME }}"
-          -Djib.to.auth.password="${{ secrets.DOCKERHUB_TOKEN }}"
-          jib:build
+          mvn --batch-mode -pl FrontService compile jib:build
+          -Djib.to.auth.username="$DOCKERHUB_USERNAME"
+          -Djib.to.auth.password="$DOCKERHUB_TOKEN"
+
+      - name: Build and push UserService
+        if: ${{ inputs.user_service == 'Run' }}
+        run: >
+          mvn --batch-mode -pl UserService compile jib:build
+          -Djib.to.auth.username="$DOCKERHUB_USERNAME"
+          -Djib.to.auth.password="$DOCKERHUB_TOKEN"
+
+      - name: Build and push TaskService
+        if: ${{ inputs.task_service == 'Run' }}
+        run: >
+          mvn --batch-mode -pl TaskService compile jib:build
+          -Djib.to.auth.username="$DOCKERHUB_USERNAME"
+          -Djib.to.auth.password="$DOCKERHUB_TOKEN"
