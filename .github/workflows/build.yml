@@ -1,6 +1,9 @@
 name: Build task-manager
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       front_service:
@@ -47,21 +50,21 @@ jobs:
           cache: maven
 
       - name: Build and push FrontService
-        if: ${{ inputs.front_service == 'Run' }}
+        if: ${{ github.event_name == 'push' || inputs.front_service == 'Run' }}
         run: >
           mvn --batch-mode -pl FrontService compile jib:build
           -Djib.to.auth.username="$DOCKERHUB_USERNAME"
           -Djib.to.auth.password="$DOCKERHUB_TOKEN"
 
       - name: Build and push UserService
-        if: ${{ inputs.user_service == 'Run' }}
+        if: ${{ github.event_name == 'push' || inputs.user_service == 'Run' }}
         run: >
           mvn --batch-mode -pl UserService compile jib:build
           -Djib.to.auth.username="$DOCKERHUB_USERNAME"
           -Djib.to.auth.password="$DOCKERHUB_TOKEN"
 
       - name: Build and push TaskService
-        if: ${{ inputs.task_service == 'Run' }}
+        if: ${{ github.event_name == 'push' || inputs.task_service == 'Run' }}
         run: >
           mvn --batch-mode -pl TaskService compile jib:build
           -Djib.to.auth.username="$DOCKERHUB_USERNAME"
