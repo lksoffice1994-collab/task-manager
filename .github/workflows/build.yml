@@ -98,11 +98,14 @@ jobs:
           SSHPASS: ${{ secrets.EC2_APPUSER_PASSWORD }}
         run: |
           sshpass -e ssh -o StrictHostKeyChecking=yes "$EC2_USER@$EC2_HOST" '
-            if [ -f /opt/apps/task-manager/docker-compose/docker-compose.yml ]; then
-                echo "Existing Compose file found; stopping the current services."
-                docker compose \
-                -f /opt/apps/task-manager/docker-compose/docker-compose.yml \
-                --project-directory /opt/apps/task-manager down
+            set -e
+
+            if [ -f /opt/apps/task-manager/docker-compose/docker-compose.yaml ]; then
+              echo "Existing Compose file found; stopping the current services."
+              docker compose \
+                -f /opt/apps/task-manager/docker-compose/docker-compose.yaml \
+                --project-directory /opt/apps/task-manager/docker-compose \
+                --project-name task-manager down
             else
               echo "No existing Compose file; skipping down."
             fi
@@ -112,9 +115,12 @@ jobs:
               /opt/apps/task-manager/docker-compose/
 
             docker compose \
-              -f /opt/apps/task-manager/docker-compose/docker-compose.yml \
-              --project-directory /opt/apps/task-manager pull &&
+              -f /opt/apps/task-manager/docker-compose/docker-compose.yaml \
+              --project-directory /opt/apps/task-manager/docker-compose \
+              --project-name task-manager pull
+
             docker compose \
-              -f /opt/apps/task-manager/docker-compose/docker-compose.yml \
-              --project-directory /opt/apps/task-manager up -d
+              -f /opt/apps/task-manager/docker-compose/docker-compose.yaml \
+              --project-directory /opt/apps/task-manager/docker-compose \
+              --project-name task-manager up -d
           '
