@@ -79,7 +79,11 @@ jobs:
           sudo apt-get install -y sshpass
 
       - name: Add EC2 host key
-        run: ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+        run: |
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          ssh-keyscan -H "$EC2_HOST" >> "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
 
       - name: Copy Compose folder to EC2
         env:
