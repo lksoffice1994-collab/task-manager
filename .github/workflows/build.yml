@@ -99,9 +99,12 @@ jobs:
         run: |
           sshpass -e ssh -o StrictHostKeyChecking=yes "$EC2_USER@$EC2_HOST" '
             if [ -f /opt/apps/task-manager/docker-compose/docker-compose.yml ]; then
-              docker compose \
+                echo "Existing Compose file found; stopping the current services."
+                docker compose \
                 -f /opt/apps/task-manager/docker-compose/docker-compose.yml \
                 --project-directory /opt/apps/task-manager down
+            else
+              echo "No existing Compose file; skipping down."
             fi
 
             mkdir -p /opt/apps/task-manager/docker-compose
