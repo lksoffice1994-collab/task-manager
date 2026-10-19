@@ -77,7 +77,7 @@
                     </from>
 
                     <to>
-                        <image>sharmalokesh1994/learning_proj-front_service</image>
+                        <image>lksoffice1994/learning_proj-front_service</image>
                         <tags>
                             <tag>${project.version}</tag>
                         </tags>

@@ -94,7 +94,7 @@
                     </from>
 
                     <to>
-                        <image>sharmalokesh1994/learning_proj-task_service</image>
+                        <image>lksoffice1994/learning_proj-task_service</image>
                         <tags>
                             <tag>${project.version}</tag>
                         </tags>
