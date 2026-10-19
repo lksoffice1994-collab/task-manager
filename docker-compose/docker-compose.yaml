@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: secret123
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  user-service:
+    image: lksoffice1994/learning_proj-user_service:0.0.2
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    environment:
+      DB_HOST: postgres
+      DB_PASSWORD: pass123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  task-service:
+    image: lksoffice1994/learning_proj-task_service:0.0.2
+    container_name: task-service
+    ports:
+      - "8082:8082"
+    environment:
+      DB_HOST: postgres
+      DB_PASSWORD: pass123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  front-service:
+    image: lksoffice1994/learning_proj-front_service:0.0.2
+    container_name: front-service
+    ports:
+      - "8080:8080"
+    environment:
+      TASK_SERVICE_HOST: task-service:8082
+      USER_SERVICE_HOST: user-service:8081
+    depends_on:
+      - user-service
+      - task-service
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

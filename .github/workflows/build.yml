@@ -38,6 +38,8 @@ jobs:
     env:
       DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      EC2_HOST: ${{ vars.EC2_HOST }}
+      EC2_USER: ${{ vars.EC2_USER }}
 
     steps:
       - name: Check out repository
@@ -70,3 +72,42 @@ jobs:
           mvn --batch-mode -pl TaskService compile jib:build
           -Djib.to.auth.username="$DOCKERHUB_USERNAME"
           -Djib.to.auth.password="$DOCKERHUB_TOKEN"
+
+      - name: Install sshpass
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+
+      - name: Add EC2 host key
+        run: ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+
+      - name: Copy Compose folder to EC2
+        env:
+          SSHPASS: ${{ secrets.EC2_APPUSER_PASSWORD }}
+        run: |
+          sshpass -e scp -o StrictHostKeyChecking=yes -r \
+            ./docker-compose \
+            "$EC2_USER@$EC2_HOST:/home/appUser/deploy-tmp/"
+
+      - name: Deploy on EC2
+        env:
+          SSHPASS: ${{ secrets.EC2_APPUSER_PASSWORD }}
+        run: |
+          sshpass -e ssh -o StrictHostKeyChecking=yes "$EC2_USER@$EC2_HOST" '
+            if [ -f /opt/apps/task-manager/docker-compose/docker-compose.yml ]; then
+              docker compose \
+                -f /opt/apps/task-manager/docker-compose/docker-compose.yml \
+                --project-directory /opt/apps/task-manager down
+            fi
+
+            mkdir -p /opt/apps/task-manager/docker-compose
+            cp -a /home/appUser/deploy-tmp/docker-compose/. \
+              /opt/apps/task-manager/docker-compose/
+
+            docker compose \
+              -f /opt/apps/task-manager/docker-compose/docker-compose.yml \
+              --project-directory /opt/apps/task-manager pull &&
+            docker compose \
+              -f /opt/apps/task-manager/docker-compose/docker-compose.yml \
+              --project-directory /opt/apps/task-manager up -d
+          '
