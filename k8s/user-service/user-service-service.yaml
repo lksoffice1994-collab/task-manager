@@ -1,0 +1,25 @@
+# Kubernetes API version for a Service.
+apiVersion: v1
+
+# A Service provides a stable network address for matching Pods.
+kind: Service
+
+metadata:
+  # Other cluster resources can reach this Service by this name.
+  name: user-service
+
+spec:
+  # ClusterIP makes this Service reachable inside the cluster.
+  type: ClusterIP
+
+  # Send traffic to Pods with this label.
+  # This must match the Deployment's Pod template label.
+  selector:
+    app: user-service
+
+  ports:
+    - name: http
+      # Port other cluster workloads use to reach this Service.
+      port: 8081
+      # Port the UserService container listens on.
+      targetPort: 8081

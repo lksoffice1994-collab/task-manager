@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Apply these namespaced resources in the task-service namespace.
+namespace: task-service
+
+resources:
+  - namespace.yaml
+  - task-service-configmap.yaml
+  - task-service-secret.yaml
+  - task-service-deployment.yaml
+  - task-service-service.yaml

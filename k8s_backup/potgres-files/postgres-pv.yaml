@@ -1,0 +1,32 @@
+
+ # Persistent volumes are assigned by admin
+apiVersion: v1
+kind: PersistentVolume
+
+metadata:
+  # PVs are cluster-scoped; they aren't created inside a namespace.
+  name: postgres-pv
+
+spec:
+  # Storage capacity offered by this volume.
+  capacity:
+    storage: 1Gi
+
+  # ReadWriteOnce allows read/write mounting from one node at a time.
+  accessModes:
+    - ReadWriteOnce
+
+  # Retain leaves the data in place if the PVC is deleted.
+  # You must manage or delete retained storage yourself.
+  persistentVolumeReclaimPolicy: Retain
+
+  # This class name must match the PVC's storageClassName.
+  # "manual" means this is a statically configured volume.
+  storageClassName: manual
+
+  # hostPath uses a directory on the Minikube node.
+  # This is convenient for Minikube learning, but not a typical
+  # production storage setup.
+  hostPath:
+    path: /mnt/data/postgres
+    type: DirectoryOrCreate

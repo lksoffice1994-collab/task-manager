@@ -1,0 +1,57 @@
+# API version for Deployment resources.
+apiVersion: apps/v1
+
+# A Deployment manages the desired number of application Pods.
+kind: Deployment
+
+metadata:
+  # Name of this Deployment.
+  name: user-service
+
+spec:
+  # Keep one UserService Pod running.
+  replicas: 1
+
+  # The Deployment manages Pods with this matching label.
+  selector:
+    matchLabels:
+      app: user-service
+
+  # Template used to create the Pod.
+  template:
+    metadata:
+      # This label must match the Deployment selector
+      # and the Service selector.
+      labels:
+        app: user-service
+
+    # Pod configuration.
+    spec:
+      containers:
+        - name: user-service
+
+          # Docker image containing your Spring Boot application.
+          image: sharmalokesh1994/learning_proj-user_service:0.0.1
+
+          # Port the application listens on inside the container.
+          ports:
+            - name: http
+              containerPort: 8081
+
+          # Add values from the ConfigMap and Secret
+          # as environment variables in the container.
+          envFrom:
+            - configMapRef:
+                name: user-service-config
+            - secretRef:
+                name: user-service-secret
+
+          # Mark the Pod ready when its application port accepts connections.
+          # The Service sends traffic only to ready Pods.
+          readinessProbe:
+            tcpSocket:
+              port: 8081
+            # Wait 10 seconds before the first check.
+            initialDelaySeconds: 10
+            # Check readiness every 5 seconds.
+            periodSeconds: 5

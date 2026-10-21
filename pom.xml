@@ -12,5 +12,6 @@
         <module>FrontService</module>
         <module>UserService</module>
         <module>TaskService</module>
+        <module>NotificationLambdaService</module>
     </modules>
 </project>

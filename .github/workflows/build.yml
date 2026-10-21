@@ -34,7 +34,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: dev
+    environment: qa
     env:
       DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}

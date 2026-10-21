@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: task-service
+spec:
+  # Run one TaskService pod.
+  replicas: 1
+
+  # Identifies which pods this Deployment manages.
+  selector:
+    matchLabels:
+      app: task-service
+
+  # Defines the pod that Kubernetes will create.
+  template:
+    metadata:
+      labels:
+        app: task-service
+    spec:
+      containers:
+        - name: task-service
+
+          # Image from your Docker Compose configuration.
+          image: sharmalokesh1994/learning_proj-task_service:0.0.1
+
+          # The app listens on port 8082, as set in application.properties.
+          ports:
+            - name: http
+              containerPort: 8082
+              protocol: TCP
+
+          # Load non-sensitive settings such as DB_HOST and DB_PORT.
+          envFrom:
+            - configMapRef:
+                name: task-service-config
+
+            # Load database credentials and JWT secret.
+            - secretRef:
+                name: task-service-secret

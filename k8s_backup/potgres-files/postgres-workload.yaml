@@ -1,0 +1,135 @@
+# API version for core Kubernetes resources such as Services.
+apiVersion: v1
+
+# A Service gives a stable network identity to matching Pods.
+kind: Service
+
+metadata:
+  # The StatefulSet refers to this Service by name.
+  name: postgres
+
+spec:
+  # A headless Service has no virtual ClusterIP.
+  # DNS resolves the Service name to its selected Pod IPs.
+  clusterIP: None
+
+  # Select Pods whose labels match this key/value pair.
+  # The StatefulSet Pod template below applies this label.
+  selector:
+    app: postgres
+
+  # Ports that the Service makes available to other cluster workloads.
+  ports:
+    - name: postgres
+      # Port clients use when connecting to the Service.
+      port: 5432
+      # Port on the selected Pod that receives the traffic.
+      targetPort: 5432
+
+---
+# The separator starts a second Kubernetes resource in this same YAML file.
+
+# API version for StatefulSet resources.
+apiVersion: apps/v1
+
+# A StatefulSet manages Pods that need stable names and identities.
+kind: StatefulSet
+
+metadata:
+  # The StatefulSet name. Its Pod will be named postgres-0.
+  name: postgres
+
+spec:
+  # Use the Service above for the StatefulSet's stable network identity.
+  # This must match the Service's metadata.name.
+  serviceName: postgres
+
+  # Desired number of PostgreSQL Pods.
+  replicas: 1
+
+  # The StatefulSet manages Pods matching this label selector.
+  selector:
+    matchLabels:
+      app: postgres
+
+  # Template used to create each StatefulSet Pod.
+  template:
+    metadata:
+      # Labels applied to the created Pod.
+      # These must match the StatefulSet selector and Service selector.
+      labels:
+        app: postgres
+
+    # Pod specification: describes the containers and storage in the Pod.
+    spec:
+      containers:
+        - name: postgres
+          # Container image and major version to run.
+          image: postgres:16
+
+          # Port PostgreSQL listens on inside the container.
+          # This documents the port; by itself it doesn't expose it to Windows.
+          ports:
+            - name: postgres
+              containerPort: 5432
+
+          # Import all keys from these resources as environment variables.
+          # postgres-config supplies POSTGRES_DB.
+          # postgres-secret supplies POSTGRES_USER and POSTGRES_PASSWORD.
+          envFrom:
+            - configMapRef:
+                name: postgres-config
+            - secretRef:
+                name: postgres-secret
+
+          # Additional environment variables for this container.
+          env:
+            # Directory where PostgreSQL stores its database files.
+            # This is set to a subdirectory of the mounted persistent volume.
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+
+          # Attach named Pod volumes to directories inside this container.
+          volumeMounts:
+            # Mount the PVC-backed database storage here.
+            # PostgreSQL writes its data under this path.
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+
+            # Mount the init SQL ConfigMap as files in this directory.
+            # For example, 01-init.sql appears at
+            # /docker-entrypoint-initdb.d/01-init.sql.
+            - name: postgres-initdb
+              mountPath: /docker-entrypoint-initdb.d
+              # The container can read the SQL scripts but cannot change them.
+              readOnly: true
+
+          # Kubernetes marks the Pod Ready when this check succeeds.
+          # The Service sends traffic only to Ready Pods.
+          readinessProbe:
+            exec:
+              # Run pg_isready inside the container, using the database
+              # user and database name supplied by the Secret and ConfigMap.
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            # Wait this many seconds before the first readiness check.
+            initialDelaySeconds: 5
+            # Repeat the check at this interval.
+            periodSeconds: 5
+
+      # Define the named volumes that can be mounted by containers in this Pod.
+      volumes:
+        # Provide persistent database storage through this PVC.
+        - name: postgres-data
+          persistentVolumeClaim:
+            # Must match the metadata.name of your PVC.
+            claimName: postgres-pvc
+
+        # Provide the initialization SQL scripts from a ConfigMap.
+        - name: postgres-initdb
+          configMap:
+            # Kustomize generates this ConfigMap from the local SQL file.
+            # It updates this reference if it adds a hash suffix to the name.
+            name: postgres-initdb

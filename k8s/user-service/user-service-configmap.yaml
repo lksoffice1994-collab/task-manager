@@ -1,0 +1,14 @@
+# Kubernetes API version for a ConfigMap.
+apiVersion: v1
+
+# A ConfigMap stores non-sensitive configuration.
+kind: ConfigMap
+
+metadata:
+  # The Deployment refers to this ConfigMap by name.
+  name: user-service-config
+
+data:
+  # UserService uses this host name to find PostgreSQL.
+  # "postgres" is the name of the PostgreSQL Service.
+  DB_HOST: task-manager-1.c1ecy202mngp.ap-southeast-2.rds.amazonaws.com

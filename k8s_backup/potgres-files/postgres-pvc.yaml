@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+
+metadata:
+  # The StatefulSet refers to this claim by name.
+  name: postgres-pvc
+
+spec:
+  # Must match the access mode offered by the PV.
+  accessModes:
+    - ReadWriteOnce
+
+  # Must match the PV's storageClassName.
+  storageClassName: manual
+
+  # Request 2 GiB, which matches this example PV.
+  resources:
+    requests:
+      storage: 1Gi

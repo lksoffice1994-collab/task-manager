@@ -1,0 +1,35 @@
+# Use the core Kubernetes API, version v1. Services use this API.
+apiVersion: v1
+
+# This resource defines a stable network endpoint for a set of pods.
+kind: Service
+
+metadata:
+  # Service name. Other pods in the same namespace can use this name
+  # to reach the frontend.
+  name: front-service
+
+spec:
+  # Request an external load balancer. In Minikube, run `minikube tunnel`
+  # in a separate terminal to make the LoadBalancer address reachable.
+  type: ClusterIP
+
+  # Route traffic to pods whose labels match this selector.
+  # The Deployment's pod template must have `app: front-service`.
+  selector:
+    app: front-service
+
+  # Define how traffic enters the Service and reaches the frontend container.
+  ports:
+    - # A descriptive name for this port.
+      name: http
+
+      # Port exposed by the Service. HTTP commonly uses port 80.
+      port: 80
+
+      # Port the frontend application listens on inside its container.
+      # This should match the Deployment's containerPort.
+      targetPort: 80
+
+      # HTTP traffic uses TCP as its transport protocol.
+      protocol: TCP

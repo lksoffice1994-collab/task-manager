@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-service
+spec:
+  replicas: 1
+  selector:     # Selecting lable for matching with resources
+    matchLabels:
+      app: front-service
+  template: # creates pods 
+    metadata:
+      labels:
+        app: front-service
+    spec:
+      containers: # container inside pod 
+        - name: front-service  # name also can be used for matching
+          # Replace with the actual image name and tag if different.
+          image: sharmalokesh1994/learning_proj-front_service:0.0.1
+          ports:
+            - name: http
+              # Replace if the container listens on another port.
+              containerPort: 80
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: front-service-config

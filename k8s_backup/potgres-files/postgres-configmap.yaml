@@ -1,0 +1,13 @@
+# Core Kubernetes API group/version for a ConfigMap.
+apiVersion: v1
+
+# This resource stores non-sensitive configuration values.
+kind: ConfigMap
+
+metadata:
+  # The StatefulSet refers to this ConfigMap by name.
+  name: postgres-config
+
+data:
+  # The official PostgreSQL image uses this to create the initial database.
+  POSTGRES_DB: postgres

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: task-service-config
+data:
+  # PostgreSQL is in the "postgres" namespace.
+  # Kubernetes DNS format: service.namespace.svc.cluster.local
+  DB_HOST: postgres.postgres.svc.cluster.local
+
+  # PostgreSQL's port inside the cluster.
+  DB_PORT: "5432"

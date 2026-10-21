@@ -1,0 +1,29 @@
+# API version for Kustomize configuration files.
+apiVersion: kustomize.config.k8s.io/v1beta1
+
+# Identifies this file as a Kustomization.
+# Kustomize reads it to build a combined set of Kubernetes resources.
+kind: Kustomization
+
+# run inside this namespace
+namespace: postgres
+
+# Kubernetes resource files to include in this Kustomization.
+# These paths are relative to the folder containing kustomization.yaml.
+resources:
+  - postgres-configmap.yaml
+  - postgres-secret.yaml
+  - postgres-pv.yaml
+  - postgres-pvc.yaml
+  - postgres-workload.yaml
+  - postgres-nodeport.yaml
+
+# Generate a Kubernetes ConfigMap from local files.
+configMapGenerator:
+  # Name referenced by the StatefulSet's ConfigMap volume.
+  - name: postgres-initdb
+    files:
+      # Kustomize reads this local SQL file and puts its contents into the ConfigMap.
+      # The filename, 01-init.sql, becomes the key and mounted filename.
+      # This path is relative to the folder containing kustomization.yaml.
+      - init-db/01-init.sql

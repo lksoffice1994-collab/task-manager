@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Place namespaced resources in the user-service namespace.
+namespace: user-service
+
+# Include the Namespace and UserService components in this Kustomization.
+resources:
+  - namespace.yaml
+  - user-service-configmap.yaml
+  - user-service-secret.yaml
+  - user-service-deployment.yaml
+  - user-service-service.yaml
