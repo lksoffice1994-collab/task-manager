@@ -31,7 +31,7 @@ spec:
         - name: user-service
 
           # Docker image containing your Spring Boot application.
-          image: lksoffice1994/learning_proj-user_service:0.0.3
+          image: lksoffice1994/learning_proj-user_service:0.0.4
 
           # Port the application listens on inside the container.
           ports:
