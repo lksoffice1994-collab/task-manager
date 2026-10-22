@@ -42,7 +42,7 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
 
       - name: Build Lambda JAR
-        run: ./mvnw --batch-mode -f NotificationLambdaService/pom.xml clean package -DskipTests
+        run: bash ./mvnw --batch-mode -f NotificationLambdaService/pom.xml clean package -DskipTests
 
       - name: Upload JAR to S3
         run: |
