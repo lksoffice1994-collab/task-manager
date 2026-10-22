@@ -13,13 +13,24 @@ iam:
 addons:
   - name: eks-pod-identity-agent
 
+vpc:
+  id: vpc-0a58ad9fd02686441
+  subnets:
+    public:
+      ap-southeast-2a:
+        id: subnet-0eea3e9e9e97135b0
+      ap-southeast-2b:
+        id: subnet-04cd0952e3493b311
+      ap-southeast-2c:
+        id: subnet-0dbe6c2954b342ff5
+
 managedNodeGroups:
   - name: task-man-cluster
-    instanceType: t3.large
-    minSize: 1
+    instanceType: t3.small
+    minSize: 2
     maxSize: 4
-    desiredCapacity: 2
-    volumeSize: 30
+    desiredCapacity: 3
+    volumeSize: 40
     volumeType: gp3
     privateNetworking: false
     iam:

@@ -15,7 +15,7 @@ spec:
       containers: # container inside pod 
         - name: front-service  # name also can be used for matching
           # Replace with the actual image name and tag if different.
-          image: sharmalokesh1994/learning_proj-front_service:0.0.1
+          image: lksoffice1994/learning_proj-front_service:0.0.3
           ports:
             - name: http
               # Replace if the container listens on another port.

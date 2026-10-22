@@ -7,7 +7,8 @@ metadata:
     # AWS Load Balancer Controller annotations for EKS
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'    
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    # alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
     # alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:524954473877:certificate/4ccf00c5-f49b-4845-9276-432e1d5707d4
     # alb.ingress.kubernetes.io/ssl-redirect: '443'
     alb.ingress.kubernetes.io/healthcheck-path: /front/actuator/health
