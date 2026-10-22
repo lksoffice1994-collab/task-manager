@@ -1,0 +1,107 @@
+## Usage cloudformation package --template-file template.yaml --s3-bucket <bucket> --output-template-file packaged-template.yaml
+
+AWSTemplateFormatVersion: "2010-09-09" # CloudFormation template format version.
+Description: Notification Lambda in the specified VPC, invoked by SNS # Short description of this stack.
+
+Parameters: # Values supplied when deploying the stack.
+  VpcId: # The VPC where CloudFormation creates the Lambda security group.
+    Type: AWS::EC2::VPC::Id # Prompts for a valid VPC ID.
+    Default: vpc-0a58ad9fd02686441 # Your VPC ID.
+    Description: VPC for the Lambda security group # Description shown during deployment.
+
+  LambdaSubnetIds: # Subnets where Lambda creates network interfaces.
+    Type: List<AWS::EC2::Subnet::Id> # Prompts for one or more subnet IDs.
+    Description: Choose subnets in the specified VPC, preferably in two Availability Zones # Select subnets from your VPC.
+
+  LambdaArtifactBucket: # S3 bucket containing your built Lambda package.
+    Type: String # Accepts a string value.
+    Description: S3 bucket containing the shaded Lambda JAR # Provide the bucket name.
+
+  LambdaArtifactKey: # S3 path/name of the Lambda package.
+    Type: String # Accepts a string value.
+    Description: S3 object key for the shaded Lambda JAR # Provide the object key.
+
+  ResendApiKey: # Resend API key supplied from a GitHub Actions secret.
+    Type: String # Accepts the API key as a string.
+    NoEcho: true # Masks the parameter in CloudFormation console and API responses.
+    Description: Resend API key passed securely by the deployment workflow
+
+Resources: # AWS resources CloudFormation creates.
+  NotificationTopic: # SNS topic that receives published notification messages.
+    Type: AWS::SNS::Topic # Creates an SNS topic.
+    Properties: # Configuration for the SNS topic.
+      TopicName: notification-topic # Sets the topic's name.
+
+  NotificationLambdaSecurityGroup: # Network rules for the Lambda's VPC network interfaces.
+    Type: AWS::EC2::SecurityGroup # Creates a VPC security group.
+    Properties: # Configuration for the security group.
+      GroupDescription: Outbound HTTPS for the notification Lambda # Describes the security group's purpose.
+      VpcId: !Ref VpcId # Creates this security group in your VPC.
+      SecurityGroupEgress: # Defines traffic the Lambda can send out.
+        - IpProtocol: tcp # Allows TCP traffic.
+          FromPort: 443 # Starts the allowed port range at HTTPS port 443.
+          ToPort: 443 # Ends the allowed port range at HTTPS port 443.
+          CidrIp: 0.0.0.0/0 # Allows HTTPS to any IPv4 destination, including Resend and AWS APIs.
+
+  NotificationLambdaRole: # IAM execution role assumed by the Lambda service.
+    Type: AWS::IAM::Role # Creates an IAM role.
+    Properties: # Configuration for the role.
+      AssumeRolePolicyDocument: # Defines which service can assume this role.
+        Version: "2012-10-17" # IAM policy language version.
+        Statement: # List of role trust rules.
+          - Effect: Allow # Allows the listed action.
+            Principal: # Identifies the service allowed to assume the role.
+              Service: lambda.amazonaws.com # Allows AWS Lambda to assume this role.
+            Action: sts:AssumeRole # IAM action Lambda uses to assume the role.
+      ManagedPolicyArns: # AWS-managed policies attached to this role.
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole # Allows writing function logs to CloudWatch.
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole # Allows Lambda to manage VPC network interfaces.
+
+  NotificationLambda: # The Java Lambda function.
+    Type: AWS::Lambda::Function # Creates a Lambda function.
+    Properties: # Configuration for the function.
+      FunctionName: NotificationLambdaService # Sets the function's name.
+      Runtime: java17 # Runs the function on the Java 17 Lambda runtime.
+      Handler: com.learning.notificationlambda.Handler::handleRequest # Java package, class, and handler method.
+      Role: !GetAtt NotificationLambdaRole.Arn # Assigns the execution role to the function.
+      Code: # Location of the deployment package.
+        S3Bucket: !Ref LambdaArtifactBucket # Reads the JAR from this S3 bucket.
+        S3Key: !Ref LambdaArtifactKey # Reads the JAR from this S3 object key.
+      Timeout: 30 # Gives each invocation up to 30 seconds.
+      MemorySize: 512 # Allocates 512 MB of memory.
+      Environment: # Environment variables made available to the function.
+        Variables: # Name/value pairs for the function.
+          RESEND_API_KEY: !Ref ResendApiKey # Resend credential supplied by GitHub Actions.
+      VpcConfig: # Attaches the Lambda network interfaces to your VPC.
+        SubnetIds: !Ref LambdaSubnetIds # Uses the subnet IDs supplied at deployment.
+        SecurityGroupIds: # Security groups attached to the Lambda network interfaces.
+          - !GetAtt NotificationLambdaSecurityGroup.GroupId # Uses the security group created above.
+
+  AllowSnsToInvokeLambda: # Permission allowing SNS to invoke this Lambda.
+    Type: AWS::Lambda::Permission # Adds a permission to the Lambda resource policy.
+    Properties: # Configuration for the permission.
+      FunctionName: !GetAtt NotificationLambda.Arn # Identifies the Lambda function.
+      Action: lambda:InvokeFunction # Allows SNS to invoke the function.
+      Principal: sns.amazonaws.com # Grants the permission to the SNS service.
+      SourceArn: !Ref NotificationTopic # Restricts invocation permission to this SNS topic.
+
+  NotificationTopicSubscription: # Connects the SNS topic to the Lambda function.
+    Type: AWS::SNS::Subscription # Creates an SNS subscription.
+    DependsOn: AllowSnsToInvokeLambda # Ensures SNS invoke permission exists before subscription creation.
+    Properties: # Configuration for the subscription.
+      TopicArn: !Ref NotificationTopic # Subscribes to the topic created above.
+      Protocol: lambda # Sets Lambda as the subscription endpoint type.
+      Endpoint: !GetAtt NotificationLambda.Arn # Sends published messages to this function.
+
+Outputs: # Values CloudFormation returns after deployment.
+  NotificationTopicArn: # Output logical name for the topic ARN.
+    Description: SNS topic ARN for publishing notifications # Explains how to use this output.
+    Value: !Ref NotificationTopic # Returns the topic ARN.
+
+  NotificationLambdaArn: # Output logical name for the function ARN.
+    Description: Notification Lambda ARN # Explains this output.
+    Value: !GetAtt NotificationLambda.Arn # Returns the Lambda ARN.
+
+  NotificationLambdaSecurityGroupId: # Output logical name for the security group ID.
+    Description: Security group attached to the Lambda # Explains this output.
+    Value: !GetAtt NotificationLambdaSecurityGroup.GroupId # Returns the created security group ID.
