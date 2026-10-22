@@ -1,4 +1,4 @@
-name: Build task-manager
+name: docker-compose-deploy
 
 on:
   push:

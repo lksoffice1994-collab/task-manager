@@ -3,7 +3,7 @@ name: Deploy Notification Lambda
 on:
   push:
     branches:
-      - master
+      - masterLambda
     paths:
       - "NotificationLambdaService/**"
       - ".github/workflows/notification-lambda.yaml"

@@ -1,0 +1,72 @@
+name: Build task-manager
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      front_service:
+        description: FrontService
+        type: choice
+        options:
+          - Run
+          - Skip
+        default: Run
+        required: true
+      user_service:
+        description: UserService
+        type: choice
+        options:
+          - Run
+          - Skip
+        default: Run
+        required: true
+      task_service:
+        description: TaskService
+        type: choice
+        options:
+          - Run
+          - Skip
+        default: Run
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build and push FrontService
+        if: ${{ github.event_name == 'push' || inputs.front_service == 'Run' }}
+        run: >
+          mvn --batch-mode -pl FrontService compile jib:build
+          -Djib.to.auth.username="$DOCKERHUB_USERNAME"
+          -Djib.to.auth.password="$DOCKERHUB_TOKEN"
+
+      - name: Build and push UserService
+        if: ${{ github.event_name == 'push' || inputs.user_service == 'Run' }}
+        run: >
+          mvn --batch-mode -pl UserService compile jib:build
+          -Djib.to.auth.username="$DOCKERHUB_USERNAME"
+          -Djib.to.auth.password="$DOCKERHUB_TOKEN"
+
+      - name: Build and push TaskService
+        if: ${{ github.event_name == 'push' || inputs.task_service == 'Run' }}
+        run: >
+          mvn --batch-mode -pl TaskService compile jib:build
+          -Djib.to.auth.username="$DOCKERHUB_USERNAME"
+          -Djib.to.auth.password="$DOCKERHUB_TOKEN"

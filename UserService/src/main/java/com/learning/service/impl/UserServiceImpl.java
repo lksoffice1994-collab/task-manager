@@ -8,6 +8,8 @@ import com.learning.exceptions.OtpNotVerifiedException;
 import com.learning.exceptions.UserServiceExceptions;
 import com.learning.model.OtpDto;
 import com.learning.model.UserDto;
+import com.learning.publisher.OtpPublisher;
+import com.learning.publisher.model.OtpPublisherModel;
 import com.learning.repository.RoleRepository;
 import com.learning.repository.UserRepository;
 import com.learning.service.UserService;
@@ -34,12 +36,15 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
 
+    private final OtpPublisher otpPublisher;
+
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, ObjectMapper objectMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+    public UserServiceImpl(UserRepository userRepository, ObjectMapper objectMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository, OtpPublisher otpPublisher) {
         this.userRepository = userRepository;
         this.objectMapper = objectMapper;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
+        this.otpPublisher = otpPublisher;
     }
 
     @Override
@@ -146,6 +151,13 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = userRepository.findByUserId(userId);
         userEntity.setOtp(generateOtp());
         userRepository.save(userEntity);
+
+        // Publish OTP to SNS topic after saving it to the database, so that the OTP is available for sending in the email.
+        otpPublisher.publishOtp(OtpPublisherModel.builder()
+                .userName(userEntity.getUsername())
+                .senderEmail(userEntity.getEmail())
+                .otp(userEntity.getOtp())
+                .build());
     }
 
     private String generateOtp() {

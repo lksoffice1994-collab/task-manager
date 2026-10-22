@@ -12,3 +12,5 @@ data:
   # UserService uses this host name to find PostgreSQL.
   # "postgres" is the name of the PostgreSQL Service.
   DB_HOST: task-manager-1.c1ecy202mngp.ap-southeast-2.rds.amazonaws.com
+  AWS_REGION: ap-southeast-2
+  SNS_NOTIFICATION_TOPIC_ARN: arn:aws:sns:ap-southeast-2:978841975360:notification-topic

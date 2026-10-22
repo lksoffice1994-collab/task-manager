@@ -10,12 +10,29 @@
 	</parent>
 	<groupId>com.learning</groupId>
 	<artifactId>UserService</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
 		<java.version>17</java.version>
+		<aws.sdk.version>2.56.0</aws.sdk.version>
 	</properties>
+
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>software.amazon.awssdk</groupId>
+				<artifactId>bom</artifactId>
+				<version>${aws.sdk.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -68,6 +85,11 @@
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
 			<version>4.27.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>sns</artifactId>
 		</dependency>
 	</dependencies>
 
