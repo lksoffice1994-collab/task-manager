@@ -2,6 +2,7 @@ package com.learning.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learning.model.OtpDto;
+import com.learning.model.UserProfilePhoto;
 import com.learning.model.UserResponseDto;
 import com.learning.service.UserService;
 import com.learning.model.UserDto;
@@ -9,8 +10,12 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
@@ -59,5 +64,28 @@ public class UserController {
     public ResponseEntity<Void> otpVerify(@PathVariable String id, @RequestBody OtpDto otp) {
         userService.verifyOtp(id, otp);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping(value = "/{id}/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    @PreAuthorize("authentication.name == #id")
+    public ResponseEntity<Void> updatePhoto(
+            @PathVariable("id") String id,
+            @RequestPart("photo") MultipartFile photo) {
+        userService.updateProfilePhoto(id, photo);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/{id}/photo")
+//    @PreAuthorize("authentication.name == #id")
+    public ResponseEntity<byte[]> getPhoto(@PathVariable("id") String id) {
+        try {
+            Optional<UserProfilePhoto> photo = userService.getProfilePhoto(id);
+            return photo.map(value -> ResponseEntity.ok()
+                            .contentType(MediaType.parseMediaType(value.contentType()))
+                            .body(value.content()))
+                    .orElseGet(() -> ResponseEntity.noContent().build());
+        } catch (RuntimeException ex) {
+            return ResponseEntity.noContent().build();
+        }
     }
 }

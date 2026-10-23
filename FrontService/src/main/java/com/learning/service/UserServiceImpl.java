@@ -11,11 +11,14 @@ import feign.FeignException;
 import feign.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Collection;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -59,6 +62,7 @@ public class UserServiceImpl implements UserService {
         HashMap<String, String> map = new HashMap<>();
         map.put("JwtToken", res.headers().get("authorization").toArray()[0].toString());
         map.put("role", res.headers().get("role").toArray()[0].toString());
+        map.put("userId", headerValue(res.headers(), "userId").orElse(loginRequest.getUsernameOrEmail()));
 
         return map;
 
@@ -72,6 +76,33 @@ public class UserServiceImpl implements UserService {
     @Override
     public void validateOtp(String id, String otp) {
         userServiceClient.otpVerify(id, new OtpDto(otp));
+    }
+
+    @Override
+    public void updateProfilePhoto(String id, MultipartFile photo, String authorization) {
+        userServiceClient.updateProfilePhoto(id, photo, authorization);
+    }
+
+    @Override
+    public ResponseEntity<byte[]> getProfilePhoto(String id, String authorization) {
+        try {
+            ResponseEntity<byte[]> response = userServiceClient.getProfilePhoto(id, authorization);
+            if (response.getBody() == null || response.getBody().length == 0) {
+                return ResponseEntity.noContent().build();
+            }
+            return response;
+        } catch (RuntimeException ex) {
+            return ResponseEntity.noContent().build();
+        }
+    }
+
+    private java.util.Optional<String> headerValue(Map<String, Collection<String>> headers, String name) {
+        return headers.entrySet().stream()
+                .filter(entry -> entry.getKey().equalsIgnoreCase(name))
+                .map(Map.Entry::getValue)
+                .filter(values -> values != null && !values.isEmpty())
+                .map(values -> values.iterator().next())
+                .findFirst();
     }
 
 

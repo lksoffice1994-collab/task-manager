@@ -5,8 +5,10 @@ import com.learning.entity.RoleEntity;
 import com.learning.entity.UserEntity;
 import com.learning.entity.UserType;
 import com.learning.exceptions.UserServiceExceptions;
+import com.learning.helper.ProfilePhotoHelper;
 import com.learning.model.OtpDto;
 import com.learning.model.UserDto;
+import com.learning.model.UserProfilePhoto;
 import com.learning.publisher.OtpPublisher;
 import com.learning.publisher.model.OtpPublisherModel;
 import com.learning.repository.RoleRepository;
@@ -23,11 +25,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -37,6 +41,7 @@ public class UserServiceImpl implements UserService {
     private final ObjectMapper objectMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final ProfilePhotoHelper profilePhotoHelper;
 
     private final OtpPublisher otpPublisher;
 
@@ -54,11 +59,12 @@ public class UserServiceImpl implements UserService {
     private final ObjectProvider<ValkeyService> valkeyServiceProvider;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, ObjectMapper objectMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository, OtpPublisher otpPublisher, ObjectProvider<ValkeyService> valkeyServiceProvider) {
+    public UserServiceImpl(UserRepository userRepository, ObjectMapper objectMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository, ProfilePhotoHelper profilePhotoHelper, OtpPublisher otpPublisher, ObjectProvider<ValkeyService> valkeyServiceProvider) {
         this.userRepository = userRepository;
         this.objectMapper = objectMapper;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
+        this.profilePhotoHelper = profilePhotoHelper;
         this.otpPublisher = otpPublisher;
         this.valkeyServiceProvider = valkeyServiceProvider;
     }
@@ -177,6 +183,19 @@ public class UserServiceImpl implements UserService {
                 .senderEmail(userEntity.getEmail())
                 .otp(userEntity.getOtp())
                 .build());
+    }
+
+    @Override
+    public void updateProfilePhoto(String userId, MultipartFile photo) {
+        if (userRepository.findByUserId(userId) == null) {
+            throw new UserServiceExceptions("User not found: " + userId);
+        }
+        profilePhotoHelper.saveProfilePhoto(userId, photo);
+    }
+
+    @Override
+    public Optional<UserProfilePhoto> getProfilePhoto(String userId) {
+        return profilePhotoHelper.getProfilePhoto(userId);
     }
 
     private String generateOtp() {

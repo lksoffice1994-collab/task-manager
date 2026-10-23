@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -60,6 +61,13 @@ public class WebSecurityConfig {
                     .requestMatchers(new AntPathRequestMatcher("/user")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/user/*")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/user/otp/**")).permitAll()
+
+                        // Allow anyone to view a user's profile photo
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/user/*/photo")).permitAll()
+
+                        // 2. Secured endpoints
+                        // Require authentication to update a profile photo
+                        .requestMatchers(AntPathRequestMatcher.antMatcher( HttpMethod.PUT, "/user/*/photo")).authenticated()
                 )
                 .addFilter(authorizationFilter)
                 .addFilter(authenticationFilter)

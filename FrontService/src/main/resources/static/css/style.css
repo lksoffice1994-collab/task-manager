@@ -64,6 +64,182 @@ body {/* --- Task Calendar and Task List Styles --- */
   text-decoration: underline;
 }
 
+.dashboard-header-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.dashboard-header-links a {
+  margin-left: 0;
+}
+
+.default-profile-photo {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-photo-control {
+  position: relative;
+}
+
+.profile-photo-trigger {
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.profile-photo-trigger:focus-visible,
+.profile-photo-menu button:focus-visible,
+.photo-button:focus-visible,
+.photo-dialog-close:focus-visible {
+  outline: 3px solid #0066cc;
+  outline-offset: 3px;
+}
+
+.profile-photo-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  z-index: 1100;
+  min-width: 140px;
+  padding: 6px;
+  border: 1px solid #d5dce5;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(10, 37, 64, 0.18);
+  transform: translateX(-50%);
+}
+
+.profile-photo-menu[hidden] {
+  display: none;
+}
+
+.profile-photo-menu button {
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #0a2540;
+  text-align: left;
+  cursor: pointer;
+}
+
+.profile-photo-menu button:hover {
+  background: #eef5fc;
+}
+
+.photo-dialog {
+  width: min(420px, calc(100% - 40px));
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  color: #222;
+  box-shadow: 0 18px 60px rgba(10, 37, 64, 0.28);
+}
+
+.photo-dialog::backdrop {
+  background: rgba(10, 24, 40, 0.55);
+}
+
+.photo-dialog-content {
+  position: relative;
+  padding: 28px;
+  text-align: center;
+}
+
+.photo-dialog-content h2 {
+  margin: 0 32px 8px;
+  color: #0a2540;
+}
+
+.photo-dialog-content p {
+  color: #536273;
+  line-height: 1.5;
+}
+
+.photo-dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #536273;
+  font-size: 1.7rem;
+  cursor: pointer;
+}
+
+.photo-dialog-close:hover {
+  background: #eef2f6;
+}
+
+.photo-preview {
+  display: block;
+  width: 112px;
+  height: 112px;
+  margin: 20px auto;
+  border: 3px solid #e5edf5;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.photo-dialog-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.photo-button {
+  padding: 10px 16px;
+  border: 1px solid #0066cc;
+  border-radius: 6px;
+  background: #0066cc;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.photo-button:hover:not(:disabled) {
+  background: #0056a3;
+}
+
+.photo-button:disabled {
+  border-color: #aab7c4;
+  background: #aab7c4;
+  cursor: not-allowed;
+}
+
+.photo-button-secondary {
+  background: #fff;
+  color: #0066cc;
+}
+
+.photo-button-secondary:hover:not(:disabled) {
+  background: #eef5fc;
+}
+
+.photo-upload-message {
+  min-height: 1.5em;
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+.photo-upload-message.error {
+  color: #b42318;
+}
+
 .main-content {
   flex: 1 0 auto;
   display: flex;
@@ -141,6 +317,13 @@ body {/* --- Task Calendar and Task List Styles --- */
   .header-links a {
     margin-left: 15px;
     font-size: 0.95rem;
+  }
+  .dashboard-header-links {
+    gap: 12px;
+  }
+  .default-profile-photo {
+    width: 36px;
+    height: 36px;
   }
   .main-content h1 {
     font-size: 1.5rem;

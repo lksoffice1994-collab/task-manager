@@ -9,13 +9,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
 
@@ -74,9 +74,9 @@ public class UserController {
                     .usernameOrEmail(loginId).password(password).build());
 
             if (map.get("role").equals("ROLE_USER_NON_VALIDATED")) {
-                return "redirect:/otp-confirmation?userId=" + loginId + "&jwt=" + map.get("JwtToken");
+                return "redirect:/otp-confirmation?userId=" + map.get("userId") + "&jwt=" + map.get("JwtToken");
             }
-            return "redirect:/tasks?userId=" + loginId + "&jwt=" + map.get("JwtToken");
+            return "redirect:/tasks?userId=" + map.get("userId") + "&jwt=" + map.get("JwtToken");
 
         } catch (FeignException e) {
             if (e.status() == HttpStatus.UNAUTHORIZED.value() || e.status() == HttpStatus.FORBIDDEN.value()) {
@@ -124,5 +124,30 @@ public class UserController {
     @GetMapping("/logout")
     public String showLogout() {
         return "logout";
+    }
+
+    @PutMapping(value = "/profile/photo/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseBody
+    public ResponseEntity<Void> updateProfilePhoto(
+            @org.springframework.web.bind.annotation.PathVariable String id,
+            @RequestPart("photo") MultipartFile photo,
+            @RequestHeader("Authorization") String authorization) {
+        userService.updateProfilePhoto(id, photo, authorization);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/profile/photo/{id}")
+    @ResponseBody
+    public ResponseEntity<byte[]> getProfilePhoto(
+            @org.springframework.web.bind.annotation.PathVariable String id,
+            @RequestHeader("Authorization") String authorization) {
+        ResponseEntity<byte[]> photo = userService.getProfilePhoto(id, authorization);
+        if (photo.getBody() == null) {
+            return ResponseEntity.noContent().build();
+        }
+        MediaType contentType = photo.getHeaders().getContentType();
+        return ResponseEntity.ok()
+                .contentType(contentType == null ? MediaType.APPLICATION_OCTET_STREAM : contentType)
+                .body(photo.getBody());
     }
 }
