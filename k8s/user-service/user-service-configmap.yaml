@@ -16,3 +16,4 @@ data:
   SNS_NOTIFICATION_TOPIC_ARN: arn:aws:sns:ap-southeast-2:978841975360:notification-topic
   OTP_CACHE_ENABLED: "true"
   VALKEY_HOST: master.task-manager-valkey.97xkjk.apse2.cache.amazonaws.com
+  USER_PROFILE_PHOTO_BUCKET: user-profile-photo-978841975360-ap-southeast-2-an

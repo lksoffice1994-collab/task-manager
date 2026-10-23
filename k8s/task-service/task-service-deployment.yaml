@@ -21,7 +21,7 @@ spec:
         - name: task-service
 
           # Image from your Docker Compose configuration.
-          image: lksoffice1994/learning_proj-task_service:0.0.5
+          image: lksoffice1994/learning_proj-task_service:0.0.7
 
           # The app listens on port 8082, as set in application.properties.
           ports:
