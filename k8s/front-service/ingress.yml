@@ -7,22 +7,34 @@ metadata:
     # AWS Load Balancer Controller annotations for EKS
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-2:978841975360:certificate/71710e27-2b1c-407a-9fda-5d0003745f73
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+
+    #alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
     # alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
     # alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:524954473877:certificate/4ccf00c5-f49b-4845-9276-432e1d5707d4
     # alb.ingress.kubernetes.io/ssl-redirect: '443'
     alb.ingress.kubernetes.io/healthcheck-path: /front/actuator/health
+    alb.ingress.kubernetes.io/actions.redirect-to-front: '{"type":"redirect","redirectConfig":{"path":"/front","statusCode":"HTTP_302"}}'
 
 spec:
   # Ingress class: 'alb' for AWS Application Load Balancer Controller, or 'nginx' for NGINX Ingress Controller
   ingressClassName: alb
   rules:
-    # Optional: specify a custom domain name:
-    # - host: nginx.example.com
-    #   http:
-    - http:
+    # host name is optional, if you want to use a custom domain name, specify it here
+    - host: app.pragyasharma.online
+      http:
         paths:
           - path: /
+            pathType: Exact
+            backend:
+              service:
+                name: redirect-to-front
+                port:
+                  name: use-annotation
+          - path: /front
             pathType: Prefix
             backend:
               service:
