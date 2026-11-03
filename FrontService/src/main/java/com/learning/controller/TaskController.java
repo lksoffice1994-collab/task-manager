@@ -72,7 +72,7 @@ public class TaskController {
                              @RequestParam("jwt") String jwtToken,
                              @RequestParam("userId") String userId) {
 
-        log.info("Update Task - userId: {}, jwt: {}, taskId: {}, task: {}",);
+        log.info("Update Task - userId: {}, jwt: {}, taskId: {}, task: {}");
         // You can use jwtToken and userId here for audit/security
         System.out.println("Update Task - userId: " + userId + ", jwt: " + jwtToken);
         task.setId(id);
