@@ -1,5 +1,7 @@
 package com.learning.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,9 +15,13 @@ import java.util.Map;
 @RequestMapping
 public class GeneralController {
 
+    private static final Logger log = LoggerFactory.getLogger(GeneralController.class);
+
     @GetMapping("/contact")
     public String showContactPage(Model model) {
         // No dynamic data needed, HTML is hardcoded
+        log.info("Accessed Contact Page");
+
         return "contact";
     }
 
@@ -27,21 +33,26 @@ public class GeneralController {
         contact.put("phone", "+91-99999-99999");
         contact.put("address", "1234, Learning Street, Tech Valley, India");
         contact.put("hours", "Mon-Fri, 9am to 6pm IST");
+
+        log.info("Accessed Contact API");
         return contact;
     }
 
     @GetMapping("/privacy")
     public String privacy() {
+        log.info("Accessed Privacy Policy Page");
         return "privacy";
     }
 
     @GetMapping("/terms")
     public String terms() {
+        log.info("Accessed Terms and Conditions Page");
         return "terms";
     }
 
     @GetMapping("/accessibility")
     public String accessibility() {
+        log.info("Accessed Accessibility Page");
         return "accessibility";
     }
 }

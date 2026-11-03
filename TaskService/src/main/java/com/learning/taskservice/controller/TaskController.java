@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learning.taskservice.controller.reqModel.TaskResModel;
 import com.learning.taskservice.dtos.TaskDto;
 import com.learning.taskservice.service.TaskService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +26,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/task")
+@Slf4j
 public class TaskController {
 
     @Autowired
@@ -38,6 +40,7 @@ public class TaskController {
                                                       @PathVariable("date") String date,
                                                       @RequestHeader(value = "${authorization.token.header.name:Authorization}", required = false) String jwtToken) {
 
+        log.info("Fetching tasks for userId: {} on date: {}", userId, date);
         Date parsedDate = null;
         try {
             parsedDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
@@ -55,6 +58,7 @@ public class TaskController {
     @PreAuthorize("hasRole('ADMIN') or principal == #taskDto.userId")
     public ResponseEntity<TaskResModel> createTask(@RequestBody TaskDto taskDto,
                                                  @RequestHeader(value = "${authorization.token.header.name:Authorization}", required = false) String jwtToken) {
+        log.info("Creating task for userId: {}", taskDto.getUserId());
         TaskDto createdDto = taskService.createTask(taskDto);
         TaskResModel resModel = objectMapper.convertValue(createdDto, TaskResModel.class);
         return ResponseEntity.ok(resModel);
@@ -64,6 +68,7 @@ public class TaskController {
     @PreAuthorize("hasRole('ADMIN') or principal == #taskDto.userId")
     public ResponseEntity<TaskResModel> updateTask(@RequestBody TaskDto taskDto,
                                                  @RequestHeader(value = "${authorization.token.header.name:Authorization}", required = false) String jwtToken) {
+        log.info("Updating task with id: {} for userId: {}", taskDto.getId(), taskDto.getUserId());
         TaskDto updatedDto = taskService.updateTask(taskDto);
         TaskResModel resModel = objectMapper.convertValue(updatedDto,TaskResModel.class);
         return ResponseEntity.ok(resModel);

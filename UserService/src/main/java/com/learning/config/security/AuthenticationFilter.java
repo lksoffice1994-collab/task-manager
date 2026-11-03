@@ -16,6 +16,7 @@ import com.learning.service.UserService;
 import com.learning.utils.UserServiceUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +36,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+@Slf4j
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 	ObjectMapper objectMapper = new ObjectMapper();
@@ -51,6 +53,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	@Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
             throws IOException {
+		log.info("Authentication failed for request: {}. Reason: {}", request.getRequestURI(), failed.getMessage());
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
@@ -58,6 +61,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         String errorCode = "AUTH_FAILED";
         String errorMsg = "Authentication failed. " + failed.getMessage();
         if (failed.getClass().getSimpleName().equals("OtpNotVerifiedException")) {
+			log.info("OTP not verified for request: {}. Reason: {}", request.getRequestURI(), failed.getMessage());
             errorCode = "OTP_NOT_VERIFIED";
             errorMsg = failed.getMessage();
         }
@@ -72,6 +76,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)
 			throws AuthenticationException {
+		log.info("Attempting authentication for request: {}", req.getRequestURI());
 		try {
 
 			LoginRequestModel creds = objectMapper.readValue(req.getInputStream(), LoginRequestModel.class);
@@ -88,6 +93,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	protected void successfulAuthentication(HttpServletRequest req, 
 			HttpServletResponse res, FilterChain chain,
 			Authentication auth) throws IOException, ServletException {
+
+		log.info("Authentication successful for user: {}", ((User)auth.getPrincipal()).getUsername());
 
 		String userName = ((User)auth.getPrincipal()).getUsername();
 

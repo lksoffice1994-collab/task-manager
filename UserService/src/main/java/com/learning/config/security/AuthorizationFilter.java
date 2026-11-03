@@ -8,6 +8,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+@Slf4j
 public class AuthorizationFilter extends BasicAuthenticationFilter {
 
     private final Environment environment;
@@ -33,7 +35,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-
+        log.info("AuthorizationFilter: Processing request for URI: {}", req.getRequestURI());
         String authorizationHeader = req.getHeader(environment.getProperty("authorization.token.header.name", "Authorization"));
         String headerPrefix = environment.getProperty("authorization.token.header.prefix", "Bearer ");
         if (authorizationHeader == null
@@ -49,6 +51,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest req) {
+        log.info("AuthorizationFilter: Extracting authentication from request for URI: {}", req.getRequestURI());
         // Use the actual property names set in your application.properties
         String headerName = environment.getProperty("authorization.token.header.name", "Authorization");
         String headerPrefix = environment.getProperty("authorization.token.header.prefix", "Bearer ");

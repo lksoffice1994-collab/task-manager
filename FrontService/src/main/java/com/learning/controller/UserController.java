@@ -7,6 +7,7 @@ import com.learning.service.UserService;
 import feign.FeignException;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -21,6 +22,7 @@ import java.util.Map;
 
 
 @Controller
+@Slf4j
 public class UserController {
 
     @Autowired
@@ -28,12 +30,14 @@ public class UserController {
 
     @GetMapping("/signup")
     public String showSignUpForm(Model model) {
+        log.info("Accessed Sign Up Page");
         model.addAttribute("user", new UserDTO());
         return "signup";
     }
 
     @PostMapping("/signup")
     public String handleSignUp(@Valid @ModelAttribute UserDTO userDTO, BindingResult result, Model model) {
+        log.info("Handling Sign Up - userDTO: {}", userDTO);
         if (result.hasErrors()) {
             model.addAttribute("user", userDTO);
             model.addAttribute("error", "Invalid field values");
@@ -51,6 +55,7 @@ public class UserController {
 
         //return "forward:/signin?userId=" + userDTO.getUserId() + "&password=" + userDTO.getPassword();
 
+        log.info("User registered successfully, redirecting to OTP confirmation for userId: {}", userDTO.getUserId());
         return "redirect:/otp-confirmation?userId=" + userDTO.getUserId();
     }
 
@@ -60,6 +65,7 @@ public class UserController {
     }
     @GetMapping("/signin")
     public String showSignInForm(Model model) {
+        log.info("Accessed Sign In Page");
         model.addAttribute("user", new UserDTO());
         return "signin";
     }
@@ -70,19 +76,23 @@ public class UserController {
                                Model model) {
 
         try {
+            log.info("Handling Sign In - loginId: {}", loginId);
             Map<String, String> map = userService.userLogin(LoginRequest.builder()
                     .usernameOrEmail(loginId).password(password).build());
 
             if (map.get("role").equals("ROLE_USER_NON_VALIDATED")) {
                 return "redirect:/otp-confirmation?userId=" + loginId + "&jwt=" + map.get("JwtToken");
             }
+            log.info("User logged in successfully, redirecting to tasks for userId: {}", loginId);
             return "redirect:/tasks?userId=" + loginId + "&jwt=" + map.get("JwtToken");
 
         } catch (FeignException e) {
             if (e.status() == HttpStatus.UNAUTHORIZED.value() || e.status() == HttpStatus.FORBIDDEN.value()) {
                 model.addAttribute("error", "Invalid email/user ID or password.");
+                log.warn("Sign In failed for loginId: {}. Reason: Invalid credentials.", loginId);
                 return "signin";
             } else {
+                log.error("Sign In failed for loginId: {}. Reason: {}", loginId, e.getMessage());
                 throw e;
             }
         }
@@ -90,6 +100,7 @@ public class UserController {
 
     @GetMapping("/home")
     public String showHome(@RequestParam String username, Model model) {
+        log.info("Accessed Home Page for username: {}", username);
         model.addAttribute("username", username);
         return "home";
     }
@@ -99,6 +110,7 @@ public class UserController {
                               @RequestParam("userId") String userId,
                               //@RequestParam("jwt") String jwtToken,
                               Model model) {
+        log.info("Accessed OTP Confirmation Page for userId: {}", userId);
         //model.addAttribute("username", username);
         model.addAttribute("userId", userId);
         // Mock JWT: Replace with real JWT logic as needed
@@ -116,6 +128,7 @@ public class UserController {
 //        System.out.println("Received JWT: " + jwtToken);
 //        System.out.println("Received userId: " + userId);
 
+        log.info("Handling OTP Confirmation - userId: {}, otp: {}, jwt: {}", userId, otp, jwtToken);
         userService.validateOtp(userId, otp);
 
         return "redirect:/signup-success";
@@ -123,6 +136,7 @@ public class UserController {
 
     @GetMapping("/logout")
     public String showLogout() {
+        log.info("Accessed Logout Page");
         return "logout";
     }
 }

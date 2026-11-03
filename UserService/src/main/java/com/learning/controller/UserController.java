@@ -6,12 +6,14 @@ import com.learning.model.UserResponseDto;
 import com.learning.service.UserService;
 import com.learning.model.UserDto;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -28,6 +30,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserDto userDTO) {
+        log.info("Creating user with userId: {}", userDTO.getUserId());
         UserDto res =  userService.createUser(userDTO);
         UserResponseDto userResponseDto = objectMapper.convertValue(res, UserResponseDto.class);
         return ResponseEntity.ok(userResponseDto);
@@ -39,6 +42,8 @@ public class UserController {
     public ResponseEntity<UserResponseDto> getUser(
             @PathVariable String id,
             @RequestHeader(value = "${authorization.token.header.name:Authorization}", required = false) String jwtToken) {
+
+        log.info("Fetching user with id: {}", id);
         // Example: fetch user by id and map to UserDto
         UserDto userDto = userService.findUserByUserId(id);
 
@@ -50,6 +55,7 @@ public class UserController {
     @GetMapping("/otp/{id}")
     // @PreAuthorize("principal == #id")
     public ResponseEntity<Void> sendOtp(@PathVariable String id) {
+        log.info("Sending OTP for user with id: {}", id);
         userService.createOtp(id);
         return ResponseEntity.ok().build();
     }
@@ -57,6 +63,7 @@ public class UserController {
     @PostMapping("/otp/{id}")
     // @PreAuthorize("principal == #id")
     public ResponseEntity<Void> otpVerify(@PathVariable String id, @RequestBody OtpDto otp) {
+        log.info("Verifying OTP for user with id: {}", id);
         userService.verifyOtp(id, otp);
         return ResponseEntity.ok().build();
     }

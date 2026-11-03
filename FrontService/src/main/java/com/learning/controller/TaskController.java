@@ -2,6 +2,8 @@ package com.learning.controller;
 
 import com.learning.dto.Task;
 import com.learning.service.TaskService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,7 @@ import java.util.*;
 @RequestMapping("/tasks")
 public class TaskController {
 
+    private static final Logger log = LoggerFactory.getLogger(TaskController.class);
     @Autowired
     private TaskService taskService;
 
@@ -27,6 +30,7 @@ public class TaskController {
             @RequestParam(value = "jwt", required = false) String jwtToken,
             Model model
     ) {
+        log.info("Accessed Tasks Page - userId: {}, jwt: {}, date: {}", userId, jwtToken, date);
         LocalDate selectedDate = date != null ? date : LocalDate.now();
         // Fill in calendar days for the month view
         List<Map<String, Object>> calendarDays = buildCalendar(selectedDate);
@@ -44,6 +48,8 @@ public class TaskController {
         model.addAttribute("userId", userId);
         model.addAttribute("jwtToken", jwtToken);
 
+        log.info("Tasks for {}: {}", selectedDate, tasks);
+
         return "tasks";
     }
 
@@ -51,10 +57,12 @@ public class TaskController {
     public String addTask(@ModelAttribute Task task,
                           @RequestParam("jwt") String jwtToken,
                           @RequestParam("userId") String userId) {
+        log.info("Add Task - userId: {}, jwt: {}, task: {}", userId, jwtToken, task);
         // You can use jwtToken and userId here for audit/security
         System.out.println("Add Task - userId: " + userId + ", jwt: " + jwtToken);
         task.setUserId(userId);
         taskService.addTask(task, jwtToken);
+        log.info("Task added successfully: {}", task);
         return "redirect:/tasks?userId=" + userId + "&jwt=" + jwtToken + "&date=" + task.getDate();
     }
 
@@ -63,15 +71,21 @@ public class TaskController {
                              @ModelAttribute Task task,
                              @RequestParam("jwt") String jwtToken,
                              @RequestParam("userId") String userId) {
+
+        log.info("Update Task - userId: {}, jwt: {}, taskId: {}, task: {}",);
         // You can use jwtToken and userId here for audit/security
         System.out.println("Update Task - userId: " + userId + ", jwt: " + jwtToken);
         task.setId(id);
         taskService.updateTask(task, jwtToken);
+        log.info("Task updated successfully: {}", task);
         return "redirect:/tasks?userId=" + userId + "&jwt=" + jwtToken + "&date=" + task.getDate();
     }
 
     // Helper for building the calendar grid for the template
     private List<Map<String, Object>> buildCalendar(LocalDate selectedDate) {
+
+        log.info("Building calendar for date: {}", selectedDate);
+
         List<Map<String, Object>> days = new ArrayList<>();
         LocalDate firstOfMonth = selectedDate.withDayOfMonth(1);
         int firstDayOfWeek = firstOfMonth.getDayOfWeek().getValue() % 7; // Sunday=0
@@ -102,6 +116,7 @@ public class TaskController {
         // while (days.size() < 42) {
         //     days.add(blankDay());
         // }
+        log.info("Calendar built with {} days (including blanks)", days.size());
         return days;
     }
 
