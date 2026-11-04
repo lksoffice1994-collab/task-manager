@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.learning</groupId>
 	<artifactId>UserService</artifactId>
-	<version>0.0.3.1</version>
+	<version>0.0.3.2</version> <!--Micrometer and monitoring added-->
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
@@ -69,6 +69,24 @@
 			<artifactId>liquibase-core</artifactId>
 			<version>4.27.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- Includes micrometer-core automatically -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- Automatically brings in the compatible 1.13.x Micrometer Prometheus registry -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
